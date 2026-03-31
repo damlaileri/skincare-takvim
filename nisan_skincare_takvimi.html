@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nisan Skincare Takvimi</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf8f5;
+    --card: #ffffff;
+    --text: #1a1714;
+    --muted: #8a8278;
+    --border: #e8e4de;
+    --glikolik: #d4722a;
+    --glikolik-bg: #fef3eb;
+    --retinol: #6b4fa0;
+    --retinol-bg: #f2eefb;
+    --no3: #2a8a6e;
+    --no3-bg: #eaf7f3;
+    --bariyer: #8a8278;
+    --bariyer-bg: #f1efe8;
+    --accent: #c4533a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 40px 24px;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  header {
+    margin-bottom: 40px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .title-block h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 42px;
+    letter-spacing: -0.5px;
+    line-height: 1;
+    color: var(--text);
+  }
+
+  .title-block h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .title-block p {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 6px;
+    font-weight: 300;
+    letter-spacing: 0.04em;
+  }
+
+  .phase-indicator {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-end;
+  }
+
+  .phase-pill {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 99px;
+    letter-spacing: 0.05em;
+  }
+
+  .phase-pill.p1 { background: #eef7ee; color: #3a7a3a; border: 1px solid #c4dfc4; }
+  .phase-pill.p2 { background: #eef0fb; color: #3a4a9a; border: 1px solid #c4caf0; }
+
+  .legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+    padding: 14px 18px;
+    background: var(--card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+
+  .leg-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .leg-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+  }
+
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-bottom: 24px;
+  }
+
+  .day-header {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 8px 4px;
+  }
+
+  .day-cell {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 7px;
+    min-height: 80px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .day-cell::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 60%, rgba(196,83,58,0.04));
+    pointer-events: none;
+  }
+
+  .day-cell:hover {
+    border-color: #c4a89a;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  }
+
+  .day-cell.selected {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(196,83,58,0.15);
+  }
+
+  .day-cell.empty {
+    background: transparent;
+    border: none;
+    cursor: default;
+    pointer-events: none;
+  }
+
+  .day-cell.empty:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .day-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 16px;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .day-cell.selected .day-num {
+    color: var(--accent);
+  }
+
+  .pip-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .pip {
+    font-size: 9px;
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .pip-g { background: var(--glikolik-bg); color: var(--glikolik); }
+  .pip-r { background: var(--retinol-bg); color: var(--retinol); }
+  .pip-n { background: var(--no3-bg); color: var(--no3); }
+  .pip-b { background: var(--bariyer-bg); color: var(--bariyer); }
+
+  .detail-panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    display: none;
+    animation: slideUp 0.2s ease;
+  }
+
+  .detail-panel.visible { display: block; }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .detail-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .detail-date {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    color: var(--text);
+  }
+
+  .detail-phase {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 99px;
+    letter-spacing: 0.04em;
+  }
+
+  .detail-phase.p1 { background: #eef7ee; color: #3a7a3a; }
+  .detail-phase.p2 { background: #eef0fb; color: #3a4a9a; }
+
+  .detail-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+
+  .routine-col {
+    padding: 20px 24px;
+  }
+
+  .routine-col:first-child {
+    border-right: 1px solid var(--border);
+  }
+
+  .routine-col h3 {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .routine-col h3 .icon {
+    font-size: 14px;
+  }
+
+  .step-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.4;
+  }
+
+  .step-item:last-child { border-bottom: none; }
+
+  .step-num {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--muted);
+    min-width: 16px;
+    margin-top: 1px;
+  }
+
+  .step-item.is-g { color: var(--glikolik); font-weight: 500; }
+  .step-item.is-r { color: var(--retinol); font-weight: 500; }
+  .step-item.is-n { color: var(--no3); font-weight: 500; }
+
+  .detail-note {
+    padding: 12px 24px 16px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+    font-style: italic;
+  }
+
+  .hint-text {
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-style: italic;
+  }
+
+  @media (max-width: 600px) {
+    body { padding: 20px 12px; }
+    .title-block h1 { font-size: 30px; }
+    .calendar-grid { gap: 4px; }
+    .day-cell { min-height: 64px; padding: 6px 5px; }
+    .detail-body { grid-template-columns: 1fr; }
+    .routine-col:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+    .phase-indicator { align-items: flex-start; }
+    header { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="title-block">
+      <h1>Nisan <em>2025</em></h1>
+      <p>Kişisel skincare takvimi · Karma cilt · Leke & göz altı morluğu</p>
+    </div>
+    <div class="phase-indicator">
+      <span class="phase-pill p1">1–13 Nisan: Faz 1 — alışma</span>
+      <span class="phase-pill p2">14–30 Nisan: Faz 2 — güçlendirme</span>
+    </div>
+  </header>
+
+  <div class="legend">
+    <div class="leg-item"><div class="leg-dot" style="background:var(--glikolik)"></div>Glikolik asit</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--retinol)"></div>Retinol</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--no3)"></div>No.3 serum</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--bariyer)"></div>Bariyer / dinlenme</div>
+  </div>
+
+  <div class="calendar-grid" id="cal"></div>
+
+  <p class="hint-text">Bir güne tıkla — o günün tam rutinini gör ↓</p>
+  <div class="detail-panel" id="detail"></div>
+
+</div>
+
+<script>
+const dayNames = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
+
+// April 1 2025 = Tuesday = index 1
+const startOffset = 1;
+
+const days = {
+  1:{sabah:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],aksam:['Kafein göz altı serumu',{text:'Glikolik asit tonik',type:'g'},'Madecassol (ince tabaka)','Nemlendirici'],phase:1,note:'Faz 1 başlangıcı. Glikolik gecesi: toner yok, sadece aktif + nemlendirici.'},
+  2:{sabah:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],aksam:['ma:nyo toner','Kafein göz altı serumu','Nemlendirici'],phase:1,note:'Bariyer gecesi — glikolik sonrası cildi dinlendir.'},
+  3:{sabah:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],aksam:['Kafein göz altı serumu','ma:nyo toner',{text:'Retinol serum',type:'r'},'Nemlendirici'],phase:1,note:'Retinol gecesi. Glikolik gecesinden 2 gece sonra — güvenli pencere.'},
+  4:{sabah:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],aksam:['ma:nyo toner','Kafein göz altı serumu','Nemlendirici'],phase:1,note:'Bariyer gecesi.'},
+  5:{sabah:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],aksam:['ma:nyo toner','Kafein göz altı serumu','Nemlendirici'],phase:1,note:'Dinlenme.'},
+  6:{sabah:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],aksam:['ma:nyo toner','Kafein göz altı serumu','Nemlendirici'],phase:1,note:'Dinlenme.'},
+  7:{sabah:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],aksam:['Kafein göz altı serumu',{text:'Glikolik asit tonik',type:'g'},'Madecassol (ince tabaka)','Nemlendirici'],phase:1,note:'2. hafta glikolik gecesi.'},
+  8:{sabah:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],aksam:['ma:nyo toner','Kafein göz altı serumu','Nemlendirici'],phase:1,note:'Bariyer gecesi.'},
+  9:{sabah:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],aksam:['Kafein göz altı serumu','ma:nyo toner',{text:'Retinol serum',type:'r'},'Nemlendirici'],phase:1,note:'Retinol gecesi.'},
+  10:{sabah:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],aksam:['ma:nyo toner','Kafein göz altı serumu','Nemlendirici'],phase:1,note:'Bariyer gecesi.'},
+  11:{sabah:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],aksam:['ma:nyo toner','Kafein göz altı serumu','Nemlendirici'],phase:1,note:'Dinlenme.'},
+  12:{sabah:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],aksam:['ma:nyo toner','Kafein göz altı serumu','Nemlendirici'],phase:1,note:'Dinlenme.'},
+  13:{sabah:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],aksam:['ma:nyo toner','Kafein göz altı serumu','Nemlendirici'],phase:1,note:'Dinlenme — yarın Faz 2 başlıyor. Ciltte tahriş varsa geçme.'},
+  14:{sabah:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],aksam:['Kafein göz altı serumu',{text:'Glikolik asit tonik',type:'g'},'Madecassol (ince tabaka)','Nemlendirici'],phase:2,note:'FAZ 2 başlıyor — haftada 1 glikolik + 2 retinol. Glikolik gecesi.'},
+  15:{sabah:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],aksam:['ma:nyo toner','Kafein göz altı serumu','Nemlendirici'],phase:2,note:'Bariyer gecesi.'},
+  16:{sabah:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],aksam:[{text:'No.3 Fermente serum',type:'n'},'Kafein göz altı serumu','ma:nyo toner',{text:'Retinol serum',type:'r'},'Nemlendirici'],phase:2,note:'Retinol + No.3 kombinasyonu. No.3 retinol tahrişini yumuşatır.'},
+  17:{sabah:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],aksam:['ma:nyo toner','Kafein göz altı serumu','Nemlendirici'],phase:2,note:'Bariyer gecesi.'},
+  18:{sabah:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],aksam:[{text:'No.3 Fermente serum',type:'n'},'Kafein göz altı serumu','ma:nyo toner',{text:'Retinol serum',type:'r'},'Nemlendirici'],phase:2,note:'2. retinol gecesi. İki retinol arası 1 bariyer gecesi korundu.'},
+  19:{sabah:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],aksam:['ma:nyo toner','Kafein göz altı serumu','Nemlendirici'],phase:2,note:'Dinlenme.'},
+  20:{sabah:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],aksam:['ma:nyo toner','Kafein göz altı serumu','Nemlendirici'],phase:2,note:'Dinlenme.'},
+  21:{sabah:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],aksam:['Kafein göz altı serumu',{text:'Glikolik asit tonik',type:'g'},'Madecassol (ince tabaka)','Nemlendirici'],phase:2,note:'Glikolik gecesi.'},
+  22:{sabah:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],aksam:['ma:nyo toner','Kafein göz altı serumu','Nemlendirici'],phase:2,note:'Bariyer gecesi.'},
+  23:{sabah:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],aksam:[{text:'No.3 Fermente serum',type:'n'},'Kafein göz altı serumu','ma:nyo toner',{text:'Retinol serum',type:'r'},'Nemlendirici'],phase:2,note:'Retinol + No.3.'},
+  24:{sabah:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],aksam:['ma:nyo toner','Kafein göz altı serumu','Nemlendirici'],phase:2,note:'Bariyer gecesi.'},
+  25:{sabah:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],aksam:[{text:'No.3 Fermente serum',type:'n'},'Kafein göz altı serumu','ma:nyo toner',{text:'Retinol serum',type:'r'},'Nemlendirici'],phase:2,note:'2. retinol gecesi.'},
+  26:{sabah:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],aksam:['ma:nyo toner','Kafein göz altı serumu','Nemlendirici'],phase:2,note:'Dinlenme.'},
+  27:{sabah:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],aksam:['ma:nyo toner','Kafein göz altı serumu','Nemlendirici'],phase:2,note:'Dinlenme.'},
+  28:{sabah:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],aksam:['Kafein göz altı serumu',{text:'Glikolik asit tonik',type:'g'},'Madecassol (ince tabaka)','Nemlendirici'],phase:2,note:'Son glikolik haftası.'},
+  29:{sabah:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],aksam:['ma:nyo toner','Kafein göz altı serumu','Nemlendirici'],phase:2,note:'Bariyer gecesi.'},
+  30:{sabah:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],aksam:[{text:'No.3 Fermente serum',type:'n'},'Kafein göz altı serumu','ma:nyo toner',{text:'Retinol serum',type:'r'},'Nemlendirici'],phase:2,note:'Nisan tamamlandı! Bir ay sonunda cildinde fark etmeye başlarsın.'},
+};
+
+const dayNamesLong = ['Salı','Çarşamba','Perşembe','Cuma','Cumartesi','Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi','Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi','Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi','Pazar','Pazartesi','Salı','Çarşamba'];
+
+function getDayType(d) {
+  const data = days[d];
+  if (!data) return 'b';
+  const aktifler = data.aksam.filter(s => typeof s === 'object');
+  const types = aktifler.map(s => s.type);
+  if (types.includes('g')) return 'g';
+  if (types.includes('r') && types.includes('n')) return 'rn';
+  if (types.includes('r')) return 'r';
+  return 'b';
+}
+
+function renderPips(d) {
+  const t = getDayType(d);
+  if (t === 'g') return `<span class="pip pip-g">Glikolik</span>`;
+  if (t === 'rn') return `<span class="pip pip-r">Retinol</span><span class="pip pip-n">No.3</span>`;
+  if (t === 'r') return `<span class="pip pip-r">Retinol</span>`;
+  return `<span class="pip pip-b">Bariyer</span>`;
+}
+
+const cal = document.getElementById('cal');
+
+dayNames.forEach(n => {
+  const h = document.createElement('div');
+  h.className = 'day-header';
+  h.textContent = n;
+  cal.appendChild(h);
+});
+
+for (let i = 0; i < startOffset; i++) {
+  const e = document.createElement('div');
+  e.className = 'day-cell empty';
+  cal.appendChild(e);
+}
+
+for (let d = 1; d <= 30; d++) {
+  const cell = document.createElement('div');
+  cell.className = 'day-cell';
+  cell.innerHTML = `<div class="day-num">${d}</div><div class="pip-stack">${renderPips(d)}</div>`;
+  cell.addEventListener('click', () => showDetail(d, cell));
+  cal.appendChild(cell);
+}
+
+const remaining = (startOffset + 30) % 7;
+if (remaining !== 0) {
+  for (let i = 0; i < 7 - remaining; i++) {
+    const e = document.createElement('div');
+    e.className = 'day-cell empty';
+    cal.appendChild(e);
+  }
+}
+
+let selectedCell = null;
+
+function showDetail(d, cell) {
+  if (selectedCell) selectedCell.classList.remove('selected');
+  cell.classList.add('selected');
+  selectedCell = cell;
+
+  const data = days[d];
+  const panel = document.getElementById('detail');
+  const phaseClass = data.phase === 1 ? 'p1' : 'p2';
+  const phaseText = data.phase === 1 ? 'Faz 1 — alışma dönemi' : 'Faz 2 — güçlendirme dönemi';
+
+  function renderSteps(arr, prefix) {
+    return arr.map((s, i) => {
+      const isObj = typeof s === 'object';
+      const text = isObj ? s.text : s;
+      const cls = isObj ? `is-${s.type}` : '';
+      const stepLabel = i === 0 ? (prefix === 'sabah' ? 'Temizleme →' : 'Çift temizleme →') : '';
+      if (i === 0) {
+        return `<div class="step-item"><span class="step-num">${i+1}</span><span>${prefix === 'sabah' ? 'Temizleme (su bazlı)' : 'Çift temizleme (yağ+su)'}</span></div>
+                <div class="step-item ${cls}"><span class="step-num">${i+2}</span><span>${text}</span></div>`;
+      }
+      return `<div class="step-item ${cls}"><span class="step-num">${i+2}</span><span>${text}</span></div>`;
+    }).join('');
+  }
+
+  function renderSabah(arr) {
+    let html = `<div class="step-item"><span class="step-num">1</span><span>Temizleme (su bazlı)</span></div>`;
+    arr.forEach((s, i) => {
+      const isObj = typeof s === 'object';
+      const text = isObj ? s.text : s;
+      const cls = isObj ? `is-${s.type}` : '';
+      html += `<div class="step-item ${cls}"><span class="step-num">${i+2}</span><span>${text}</span></div>`;
+    });
+    return html;
+  }
+
+  function renderAksam(arr) {
+    let html = `<div class="step-item"><span class="step-num">1</span><span>Çift temizleme (yağ+su)</span></div>`;
+    arr.forEach((s, i) => {
+      const isObj = typeof s === 'object';
+      const text = isObj ? s.text : s;
+      const cls = isObj ? `is-${s.type}` : '';
+      html += `<div class="step-item ${cls}"><span class="step-num">${i+2}</span><span>${text}</span></div>`;
+    });
+    return html;
+  }
+
+  panel.innerHTML = `
+    <div class="detail-header">
+      <div class="detail-date">1 Nisan — ${d} · ${dayNamesLong[d-1]}</div>
+      <span class="detail-phase ${phaseClass}">${phaseText}</span>
+    </div>
+    <div class="detail-body">
+      <div class="routine-col">
+        <h3><span class="icon">☀️</span> Sabah rutini</h3>
+        ${renderSabah(data.sabah)}
+      </div>
+      <div class="routine-col">
+        <h3><span class="icon">🌙</span> Akşam rutini</h3>
+        ${renderAksam(data.aksam)}
+      </div>
+    </div>
+    <div class="detail-note">${data.note}</div>
+  `;
+
+  panel.classList.add('visible');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+</script>
+</body>
+</html>
