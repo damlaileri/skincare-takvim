@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Skincare">
+<meta name="theme-color" content="#faf8f5">
+<title>Nisan Skincare</title>
+
+<!-- PWA icon inline as SVG data URI -->
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='115' fill='%23faf8f5'/%3E%3Ccircle cx='256' cy='200' r='110' fill='%23f2d5c8'/%3E%3Ccircle cx='256' cy='200' r='80' fill='%23e8b4a0'/%3E%3Ccircle cx='256' cy='200' r='52' fill='%23c4533a'/%3E%3Crect x='120' y='340' width='272' height='36' rx='18' fill='%23c4533a'/%3E%3Crect x='160' y='394' width='192' height='28' rx='14' fill='%23e8b4a0'/%3E%3C/svg%3E">
+
+<style>
+  :root {
+    --bg: #faf8f5;
+    --card: #ffffff;
+    --text: #1a1714;
+    --muted: #8a8278;
+    --border: #e8e4de;
+    --glikolik: #d4722a;
+    --glikolik-bg: #fef3eb;
+    --retinol: #6b4fa0;
+    --retinol-bg: #f2eefb;
+    --no3: #2a8a6e;
+    --no3-bg: #eaf7f3;
+    --bariyer: #8a8278;
+    --bariyer-bg: #f1efe8;
+    --accent: #c4533a;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: -apple-system, 'Helvetica Neue', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    padding: calc(var(--safe-top) + 24px) 16px calc(var(--safe-bottom) + 32px);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container { max-width: 480px; margin: 0 auto; }
+
+  header { margin-bottom: 24px; }
+
+  .header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .today-badge {
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--accent);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 99px;
+    letter-spacing: 0.04em;
+    margin-top: 4px;
+  }
+
+  .subtitle {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 400;
+    letter-spacing: 0.02em;
+  }
+
+  .phase-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  .phase-pill {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 99px;
+    letter-spacing: 0.04em;
+  }
+  .p1 { background: #eef7ee; color: #2d6a2d; }
+  .p2 { background: #eef0fb; color: #3a4a9a; }
+
+  .legend {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+    padding: 10px 14px;
+    background: var(--card);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+
+  .leg { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
+  .ld { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+    margin-bottom: 16px;
+  }
+
+  .day-header {
+    text-align: center;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 6px 0;
+  }
+
+  .day-cell {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 5px 4px;
+    min-height: 58px;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+    position: relative;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .day-cell:active { transform: scale(0.96); }
+
+  .day-cell.today-cell {
+    border: 2px solid var(--accent);
+    background: #fff9f7;
+  }
+
+  .day-cell.selected {
+    border: 2px solid var(--accent);
+    box-shadow: 0 0 0 3px rgba(196,83,58,0.12);
+    background: #fff9f7;
+  }
+
+  .day-cell.empty {
+    background: transparent;
+    border: none;
+    cursor: default;
+    pointer-events: none;
+  }
+
+  .day-num {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .today-cell .day-num,
+  .selected .day-num { color: var(--accent); }
+
+  .today-dot {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .pip-stack { display: flex; flex-direction: column; gap: 2px; }
+
+  .pip {
+    font-size: 8px;
+    font-weight: 600;
+    padding: 1px 4px;
+    border-radius: 3px;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .pip-g { background: var(--glikolik-bg); color: var(--glikolik); }
+  .pip-r { background: var(--retinol-bg); color: var(--retinol); }
+  .pip-n { background: var(--no3-bg); color: var(--no3); }
+  .pip-b { background: var(--bariyer-bg); color: var(--bariyer); }
+
+  /* Detail panel */
+  .detail-panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    display: none;
+  }
+
+  .detail-panel.visible {
+    display: block;
+    animation: fadeUp 0.22s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .detail-header {
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .detail-date {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    line-height: 1.1;
+  }
+
+  .detail-dayname {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .detail-phase {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 99px;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+
+  .detail-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .routine-col {
+    padding: 14px 16px;
+  }
+
+  .routine-col:first-child {
+    border-right: 1px solid var(--border);
+  }
+
+  .col-title {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .step-item {
+    display: flex;
+    gap: 6px;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    line-height: 1.35;
+    align-items: flex-start;
+  }
+
+  .step-item:last-child { border-bottom: none; }
+
+  .step-n {
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--muted);
+    min-width: 14px;
+    margin-top: 1px;
+  }
+
+  .step-item.is-g { color: var(--glikolik); font-weight: 600; }
+  .step-item.is-r { color: var(--retinol); font-weight: 600; }
+  .step-item.is-n { color: var(--no3); font-weight: 600; }
+
+  .detail-note {
+    padding: 10px 18px 14px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.6;
+    font-style: italic;
+  }
+
+  .scroll-hint {
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 12px;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="header-top">
+      <div>
+        <h1>Nisan <span>2025</span></h1>
+        <div class="subtitle">Skincare takvimi · Karma cilt</div>
+      </div>
+      <div class="today-badge" id="todayBadge">Bugün yükleniyor...</div>
+    </div>
+  </header>
+
+  <div class="phase-row">
+    <span class="phase-pill p1">1–13 Nis: Faz 1 — alışma</span>
+    <span class="phase-pill p2">14–30 Nis: Faz 2 — güçlendirme</span>
+  </div>
+
+  <div class="legend">
+    <div class="leg"><div class="ld" style="background:var(--glikolik)"></div>Glikolik</div>
+    <div class="leg"><div class="ld" style="background:var(--retinol)"></div>Retinol</div>
+    <div class="leg"><div class="ld" style="background:var(--no3)"></div>No.3</div>
+    <div class="leg"><div class="ld" style="background:var(--bariyer)"></div>Bariyer</div>
+  </div>
+
+  <div class="calendar-grid" id="cal"></div>
+
+  <p class="scroll-hint" id="scrollHint">Bir güne dokun — rutini gör ↓</p>
+  <div class="detail-panel" id="detail"></div>
+
+</div>
+
+<script>
+const DATA = {
+  1:{s:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],a:['Kafein göz altı',{t:'Glikolik asit tonik',c:'g'},'Madecassol','Nemlendirici'],p:1,n:'Glikolik gecesi. Toner yok — sadece aktif + nemlendirici.'},
+  2:{s:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],a:['ma:nyo toner','Kafein göz altı','Nemlendirici'],p:1,n:'Bariyer gecesi — glikolik sonrası dinlenme.'},
+  3:{s:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],a:['Kafein göz altı','ma:nyo toner',{t:'Retinol serum',c:'r'},'Nemlendirici'],p:1,n:'Retinol gecesi. Glikolik\'ten 2 gece sonra — güvenli pencere.'},
+  4:{s:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],a:['ma:nyo toner','Kafein göz altı','Nemlendirici'],p:1,n:'Bariyer gecesi.'},
+  5:{s:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],a:['ma:nyo toner','Kafein göz altı','Nemlendirici'],p:1,n:'Dinlenme.'},
+  6:{s:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],a:['ma:nyo toner','Kafein göz altı','Nemlendirici'],p:1,n:'Dinlenme.'},
+  7:{s:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],a:['Kafein göz altı',{t:'Glikolik asit tonik',c:'g'},'Madecassol','Nemlendirici'],p:1,n:'2. hafta glikolik gecesi.'},
+  8:{s:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],a:['ma:nyo toner','Kafein göz altı','Nemlendirici'],p:1,n:'Bariyer gecesi.'},
+  9:{s:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],a:['Kafein göz altı','ma:nyo toner',{t:'Retinol serum',c:'r'},'Nemlendirici'],p:1,n:'Retinol gecesi.'},
+  10:{s:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],a:['ma:nyo toner','Kafein göz altı','Nemlendirici'],p:1,n:'Bariyer gecesi.'},
+  11:{s:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],a:['ma:nyo toner','Kafein göz altı','Nemlendirici'],p:1,n:'Dinlenme.'},
+  12:{s:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],a:['ma:nyo toner','Kafein göz altı','Nemlendirici'],p:1,n:'Dinlenme.'},
+  13:{s:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],a:['ma:nyo toner','Kafein göz altı','Nemlendirici'],p:1,n:'Yarın Faz 2 başlıyor. Ciltte tahriş varsa geçme.'},
+  14:{s:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],a:['Kafein göz altı',{t:'Glikolik asit tonik',c:'g'},'Madecassol','Nemlendirici'],p:2,n:'FAZ 2 başlıyor — haftada 1 glikolik + 2 retinol.'},
+  15:{s:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],a:['ma:nyo toner','Kafein göz altı','Nemlendirici'],p:2,n:'Bariyer gecesi.'},
+  16:{s:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],a:[{t:'No.3 Fermente serum',c:'n'},'Kafein göz altı','ma:nyo toner',{t:'Retinol serum',c:'r'},'Nemlendirici'],p:2,n:'Retinol + No.3. No.3 retinol tahrişini yumuşatır.'},
+  17:{s:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],a:['ma:nyo toner','Kafein göz altı','Nemlendirici'],p:2,n:'Bariyer gecesi.'},
+  18:{s:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],a:[{t:'No.3 Fermente serum',c:'n'},'Kafein göz altı','ma:nyo toner',{t:'Retinol serum',c:'r'},'Nemlendirici'],p:2,n:'2. retinol gecesi. İki retinol arası 1 bariyer korundu.'},
+  19:{s:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],a:['ma:nyo toner','Kafein göz altı','Nemlendirici'],p:2,n:'Dinlenme.'},
+  20:{s:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],a:['ma:nyo toner','Kafein göz altı','Nemlendirici'],p:2,n:'Dinlenme.'},
+  21:{s:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],a:['Kafein göz altı',{t:'Glikolik asit tonik',c:'g'},'Madecassol','Nemlendirici'],p:2,n:'Glikolik gecesi.'},
+  22:{s:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],a:['ma:nyo toner','Kafein göz altı','Nemlendirici'],p:2,n:'Bariyer gecesi.'},
+  23:{s:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],a:[{t:'No.3 Fermente serum',c:'n'},'Kafein göz altı','ma:nyo toner',{t:'Retinol serum',c:'r'},'Nemlendirici'],p:2,n:'Retinol + No.3.'},
+  24:{s:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],a:['ma:nyo toner','Kafein göz altı','Nemlendirici'],p:2,n:'Bariyer gecesi.'},
+  25:{s:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],a:[{t:'No.3 Fermente serum',c:'n'},'Kafein göz altı','ma:nyo toner',{t:'Retinol serum',c:'r'},'Nemlendirici'],p:2,n:'2. retinol gecesi.'},
+  26:{s:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],a:['ma:nyo toner','Kafein göz altı','Nemlendirici'],p:2,n:'Dinlenme.'},
+  27:{s:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],a:['ma:nyo toner','Kafein göz altı','Nemlendirici'],p:2,n:'Dinlenme.'},
+  28:{s:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],a:['Kafein göz altı',{t:'Glikolik asit tonik',c:'g'},'Madecassol','Nemlendirici'],p:2,n:'Son glikolik haftası.'},
+  29:{s:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],a:['ma:nyo toner','Kafein göz altı','Nemlendirici'],p:2,n:'Bariyer gecesi.'},
+  30:{s:['ma:nyo toner','Glutathione serum (No.5)','Nemlendirici','SPF 50+'],a:[{t:'No.3 Fermente serum',c:'n'},'Kafein göz altı','ma:nyo toner',{t:'Retinol serum',c:'r'},'Nemlendirici'],p:2,n:'Nisan tamamlandı! 🌿 Bir ay sonunda cildinde fark etmeye başlarsın.'},
+};
+
+const DN_SHORT = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
+const DN_LONG  = ['Salı','Çarşamba','Perşembe','Cuma','Cumartesi','Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi','Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi','Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi','Pazar','Pazartesi','Salı','Çarşamba'];
+// April 1 2025 = Tuesday → offset 1
+const START_OFFSET = 1;
+
+function pipHTML(d) {
+  const data = DATA[d];
+  const types = data.a.filter(x=>typeof x==='object').map(x=>x.c);
+  if (types.includes('g')) return `<span class="pip pip-g">Glikolik</span>`;
+  if (types.includes('r') && types.includes('n')) return `<span class="pip pip-r">Retinol</span><span class="pip pip-n">No.3</span>`;
+  if (types.includes('r')) return `<span class="pip pip-r">Retinol</span>`;
+  return `<span class="pip pip-b">Bariyer</span>`;
+}
+
+const cal = document.getElementById('cal');
+
+// headers
+DN_SHORT.forEach(n => {
+  const h = document.createElement('div');
+  h.className = 'day-header';
+  h.textContent = n;
+  cal.appendChild(h);
+});
+
+// empty offset
+for (let i=0;i<START_OFFSET;i++) {
+  const e=document.createElement('div');
+  e.className='day-cell empty';
+  cal.appendChild(e);
+}
+
+const today = new Date();
+const isApril2025 = today.getFullYear()===2025 && today.getMonth()===3;
+const todayDay = isApril2025 ? today.getDate() : null;
+
+const cells = {};
+for (let d=1;d<=30;d++) {
+  const cell=document.createElement('div');
+  cell.className='day-cell';
+  if (d===todayDay) cell.classList.add('today-cell');
+  cell.innerHTML=`<div class="day-num">${d}</div>${d===todayDay?'<div class="today-dot"></div>':''}
+  <div class="pip-stack">${pipHTML(d)}</div>`;
+  cell.addEventListener('click',()=>showDetail(d));
+  cal.appendChild(cell);
+  cells[d]=cell;
+}
+
+// trailing empties
+const total = START_OFFSET + 30;
+const rem = total % 7;
+if (rem!==0) {
+  for (let i=0;i<7-rem;i++) {
+    const e=document.createElement('div');
+    e.className='day-cell empty';
+    cal.appendChild(e);
+  }
+}
+
+// Update badge
+const badge = document.getElementById('todayBadge');
+if (todayDay) {
+  badge.textContent = `${todayDay} Nisan`;
+} else {
+  badge.textContent = 'Nisan 2025';
+  badge.style.background = 'var(--muted)';
+}
+
+let selectedDay = null;
+
+function showDetail(d) {
+  if (selectedDay!==null && cells[selectedDay]) {
+    cells[selectedDay].classList.remove('selected');
+    if (selectedDay===todayDay) cells[selectedDay].classList.add('today-cell');
+  }
+  cells[d].classList.add('selected');
+  selectedDay=d;
+
+  const data=DATA[d];
+  const pClass=data.p===1?'p1':'p2';
+  const pText=data.p===1?'Faz 1 — alışma':'Faz 2 — güçlendirme';
+
+  function stepsHTML(arr, isMorning) {
+    const prefix = isMorning ? 'Temizleme (su bazlı)' : 'Çift temizleme (yağ+su)';
+    let html = `<div class="step-item"><span class="step-n">1</span><span>${prefix}</span></div>`;
+    arr.forEach((s,i) => {
+      const isObj = typeof s==='object';
+      const text = isObj?s.t:s;
+      const cls = isObj?`is-${s.c}`:'';
+      html+=`<div class="step-item ${cls}"><span class="step-n">${i+2}</span><span>${text}</span></div>`;
+    });
+    return html;
+  }
+
+  const panel=document.getElementById('detail');
+  panel.innerHTML=`
+    <div class="detail-header">
+      <div>
+        <div class="detail-date">${d} Nisan${d===todayDay?' · Bugün':''}</div>
+        <div class="detail-dayname">${DN_LONG[d-1]}</div>
+      </div>
+      <span class="detail-phase ${pClass}">${pText}</span>
+    </div>
+    <div class="detail-cols">
+      <div class="routine-col">
+        <div class="col-title">☀️ Sabah</div>
+        ${stepsHTML(data.s,true)}
+      </div>
+      <div class="routine-col">
+        <div class="col-title">🌙 Akşam</div>
+        ${stepsHTML(data.a,false)}
+      </div>
+    </div>
+    <div class="detail-note">${data.n}</div>
+  `;
+
+  panel.classList.add('visible');
+  document.getElementById('scrollHint').style.display='none';
+  setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
+}
+
+// Auto-open today
+if (todayDay && DATA[todayDay]) {
+  setTimeout(()=>showDetail(todayDay), 120);
+}
+</script>
+</body>
+</html>
