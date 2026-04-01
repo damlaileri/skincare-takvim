@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Skincare Takvimi</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Skincare">
+<meta name="theme-color" content="#faf8f5">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%23faf8f5'/%3E%3Ccircle cx='90' cy='75' r='36' fill='none' stroke='%23c4533a' stroke-width='8'/%3E%3Cellipse cx='90' cy='75' rx='15' ry='22' fill='none' stroke='%23c4533a' stroke-width='6'/%3E%3Cline x1='90' y1='39' x2='90' y2='111' stroke='%23c4533a' stroke-width='6'/%3E%3Cline x1='54' y1='75' x2='126' y2='75' stroke='%23c4533a' stroke-width='6'/%3E%3Ctext x='90' y='152' text-anchor='middle' font-family='Georgia,serif' font-size='20' font-style='italic' fill='%23c4533a'%3Eskincare%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#faf8f5;--card:#fff;--text:#1a1714;--muted:#8a8278;--border:#e8e4de;--r:#6b4fa0;--rbg:#f2eefb;--g:#d4722a;--gbg:#fef3eb;--aha:#2a8a6e;--ahabg:#eaf7f3;--p:#185fa5;--pbg:#e6f1fb;--k:#a32d2d;--kbg:#fcebeb;--accent:#c4533a;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:calc(16px + env(safe-area-inset-top,0px)) 14px calc(16px + env(safe-area-inset-bottom,0px));}
+.wrap{max-width:480px;margin:0 auto;}
+header{margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.htop{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;}
+h1{font-family:'DM Serif Display',serif;font-size:30px;line-height:1;}
+h1 em{font-style:italic;color:var(--accent);}
+.sub{font-size:11px;color:var(--muted);font-weight:300;letter-spacing:.04em;margin-top:3px;}
+.tbadge{background:var(--accent);color:#fff;font-size:11px;font-weight:500;padding:4px 10px;border-radius:99px;white-space:nowrap;margin-top:3px;}
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;padding:9px 12px;background:var(--card);border-radius:10px;border:1px solid var(--border);}
+.li{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);}
+.ld{width:8px;height:8px;border-radius:2px;}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:14px;}
+.dh{text-align:center;font-size:10px;font-weight:500;color:var(--muted);letter-spacing:.05em;padding:5px 2px;}
+.dc{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:5px 4px;min-height:62px;cursor:pointer;transition:all .12s;-webkit-user-select:none;}
+.dc:active{transform:scale(.95);}
+.dc.sel{border-color:var(--accent);box-shadow:0 0 0 2px rgba(196,83,58,.18);}
+.dc.today{background:#fff8f6;border-color:#e8b8a8;}
+.dc.today .dn{color:var(--accent);}
+.dc.emp{background:transparent;border:none;cursor:default;pointer-events:none;}
+.dn{font-family:'DM Serif Display',serif;font-size:14px;line-height:1;margin-bottom:3px;}
+.ps{display:flex;flex-direction:column;gap:2px;}
+.pip{font-size:8px;font-weight:500;padding:1px 4px;border-radius:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pr{background:var(--rbg);color:var(--r);}
+.pg{background:var(--gbg);color:var(--g);}
+.pa{background:var(--ahabg);color:var(--aha);}
+.pp{background:var(--pbg);color:var(--p);}
+.pk{background:var(--kbg);color:var(--k);}
+.dp{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:28px;}
+.dph{padding:14px 16px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.ddate{font-family:'DM Serif Display',serif;font-size:20px;}
+.tabs{display:flex;border-bottom:1px solid var(--border);}
+.tab{flex:1;padding:9px;text-align:center;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;-webkit-user-select:none;}
+.tab.act{color:var(--accent);border-bottom-color:var(--accent);}
+.rbody{padding:12px 16px;}
+.si{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;line-height:1.4;}
+.si:last-child{border-bottom:none;}
+.sn{font-size:10px;font-weight:500;color:var(--muted);min-width:14px;margin-top:2px;}
+.si.ir{color:var(--r);font-weight:500;}
+.si.ig{color:var(--g);font-weight:500;}
+.si.ia{color:var(--aha);font-weight:500;}
+.si.ip{color:var(--p);font-weight:500;}
+.si.ik{color:var(--k);font-weight:500;}
+.dnote{padding:9px 16px 12px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);line-height:1.6;font-style:italic;}
+.anch{height:1px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="htop">
+    <div><h1>Nisan <em>'26</em></h1><p class="sub">Kişisel skincare takvimi</p></div>
+    <div class="tbadge" id="tbadge">Nisan 2026</div>
+  </div>
+</header>
+<div class="legend">
+  <div class="li"><div class="ld" style="background:var(--r)"></div>Retinol</div>
+  <div class="li"><div class="ld" style="background:var(--g)"></div>Glikolik asit</div>
+  <div class="li"><div class="ld" style="background:var(--aha)"></div>AHA/BHA</div>
+  <div class="li"><div class="ld" style="background:var(--p)"></div>Propolis</div>
+  <div class="li"><div class="ld" style="background:var(--k)"></div>Kil maskesi</div>
+</div>
+<div class="cal" id="cal"></div>
+<div class="anch" id="anch"></div>
+<div class="dp" id="dp"></div>
+</div>
+<script>
+// 1 Nisan 2026 = Çarşamba = index 2 (Pzt=0, Sal=1, Çar=2...)
+const START = 2;
+const DNS=['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
+const DNL=['Çarşamba','Perşembe','Cuma','Cumartesi','Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi','Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi','Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi','Pazar','Pazartesi','Salı','Çarşamba','Perşembe'];
+
+// Haftanın günleri: 1 Nis = Çar, 2 = Per, 3 = Cum, 4 = Cmt, 5 = Paz, 6 = Pzt, 7 = Sal
+// Çar=0, Per=1, Cum=2, Cmt=3, Paz=4, Pzt=5, Sal=6 (döngü)
+function dayOfWeek(d) {
+  // 1 Nisan = Çarşamba (2 mod 7)
+  return (d - 1) % 7; // 0=Çar,1=Per,2=Cum,3=Cmt,4=Paz,5=Pzt,6=Sal
+}
+
+// Sabah rutini (sabit)
+const SABAH = ['Niacinamide', 'C Vitamini (AHA/BHA veya glikolik gecesi sonrası kullanma)', 'Nemlendirici', 'Güneş kremi'];
+
+// Akşam rutini günün adına göre
+// Çar(0): AHA/BHA, Per(1): Glikolik+Propolis, Cum(2): Retinol+Propolis
+// Cmt(3): Kil maskesi+Propolis, Paz(4): Retinol+Propolis, Pzt(5): Propolis, Sal(6): Retinol+Propolis
+function getAksam(d) {
+  const dow = dayOfWeek(d);
+  if (dow === 0) return { steps: [{t:'AHA/BHA',c:'a'},'Nemlendirici'], note:'AHA/BHA gecesi — C vitamini sabah kullanma.', pips:['a'] };
+  if (dow === 1) return { steps: [{t:'Glikolik asit',c:'g'},{t:'Propolis',c:'p'},'Nemlendirici'], note:'Glikolik + Propolis. C vitamini sabah kullanma.', pips:['g','p'] };
+  if (dow === 2) return { steps: [{t:'Retinol',c:'r'},{t:'Propolis',c:'p'},'Nemlendirici'], note:'Retinol + Propolis gecesi.', pips:['r','p'] };
+  if (dow === 3) return { steps: [{t:'Kil maskesi',c:'k'},{t:'Propolis',c:'p'},'Nemlendirici'], note:'Kil maskesi + Propolis. Maske sonrası propolis yatıştırıcı.', pips:['k','p'] };
+  if (dow === 4) return { steps: [{t:'Retinol',c:'r'},{t:'Propolis',c:'p'},'Nemlendirici'], note:'Retinol + Propolis gecesi.', pips:['r','p'] };
+  if (dow === 5) return { steps: [{t:'Propolis',c:'p'},'Nemlendirici'], note:'Sadece propolis — bariyer onarım gecesi.', pips:['p'] };
+  if (dow === 6) return { steps: [{t:'Retinol',c:'r'},{t:'Propolis',c:'p'},'Nemlendirici'], note:'Retinol + Propolis gecesi.', pips:['r','p'] };
+}
+
+function renderPips(d) {
+  const a = getAksam(d);
+  const map = {r:'pr',g:'pg',a:'pa',p:'pp',k:'pk'};
+  return a.pips.map(p=>`<span class="pip ${map[p]}">${p==='r'?'Retinol':p==='g'?'Glikolik':p==='a'?'AHA/BHA':p==='p'?'Propolis':'Kil'}</span>`).join('');
+}
+
+const cal = document.getElementById('cal');
+DNS.forEach(n=>{const h=document.createElement('div');h.className='dh';h.textContent=n;cal.appendChild(h);});
+for(let i=0;i<START;i++){const e=document.createElement('div');e.className='dc emp';cal.appendChild(e);}
+for(let d=1;d<=30;d++){
+  const c=document.createElement('div');c.className='dc';c.id='d'+d;
+  c.innerHTML=`<div class="dn">${d}</div><div class="ps">${renderPips(d)}</div>`;
+  c.addEventListener('click',()=>show(d,c));
+  cal.appendChild(c);
+}
+const rem=(START+30)%7;
+if(rem!==0){for(let i=0;i<7-rem;i++){const e=document.createElement('div');e.className='dc emp';cal.appendChild(e);}}
+
+let sc=null,atab='aksam';
+
+function show(d,cell){
+  if(sc)sc.classList.remove('sel');
+  cell.classList.add('sel');sc=cell;
+  rd(d,atab);
+  document.getElementById('anch').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function rd(d,tab){
+  const panel=document.getElementById('dp');
+  const ak=getAksam(d);
+
+  function renderSabah(){
+    // C vitamini uyarısı: AHA/BHA (Çar) veya Glikolik (Per) gecesinin sabahı
+    const dow=dayOfWeek(d);
+    let html=`<div class="si"><span class="sn">1</span><span>Temizleme</span></div>`;
+    SABAH.forEach((s,i)=>{
+      const isCvit = i===1;
+      const prevDow = dayOfWeek(d===1?7:d);
+      const warn = isCvit && (dow===1||dow===2) ? ' ⚠ bugün kullanma' : '';
+      html+=`<div class="si${isCvit&&warn?' ia':''}"><span class="sn">${i+2}</span><span>${s}${warn}</span></div>`;
+    });
+    return html;
+  }
+
+  function renderAksam(){
+    let html=`<div class="si"><span class="sn">1</span><span>Temizleme</span></div>`;
+    ak.steps.forEach((s,i)=>{
+      const isObj=typeof s==='object';
+      const tx=isObj?s.t:s;
+      const cl=isObj?`i${s.c}`:'';
+      html+=`<div class="si ${cl}"><span class="sn">${i+2}</span><span>${tx}</span></div>`;
+    });
+    return html;
+  }
+
+  panel.innerHTML=`
+    <div class="dph">
+      <div class="ddate">${d} Nisan · ${DNL[d-1]}</div>
+    </div>
+    <div class="tabs">
+      <div class="tab ${tab==='sabah'?'act':''}" onclick="st(${d},'sabah')">☀️ Sabah</div>
+      <div class="tab ${tab==='aksam'?'act':''}" onclick="st(${d},'aksam')">🌙 Akşam</div>
+    </div>
+    <div class="rbody">${tab==='sabah'?renderSabah():renderAksam()}</div>
+    <div class="dnote">${ak.note}</div>
+  `;
+}
+
+function st(d,tab){atab=tab;rd(d,tab);}
+
+const today=new Date();
+const isAp=today.getMonth()===3&&today.getFullYear()===2026;
+const td=isAp?today.getDate():null;
+const badge=document.getElementById('tbadge');
+if(td&&td>=1&&td<=30){
+  badge.textContent=`Bugün: ${td} Nisan`;
+  const tc=document.getElementById('d'+td);
+  if(tc){tc.classList.add('today');setTimeout(()=>show(td,tc),150);}
+}else{badge.style.background='var(--muted)';}
+</script>
+</body>
+</html>
